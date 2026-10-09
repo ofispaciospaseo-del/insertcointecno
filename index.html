@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fechadora Exacta - Mobile Arcade | Mardelwood</title>
+  <style>
+    :root {
+      --bg-color: #080312;
+      --neon-pink: #ff007f;
+      --neon-blue: #00f0ff;
+      --neon-yellow: #ffee00;
+      --neon-green: #00ff66;
+      --neon-purple: #9d00ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 12px;
+    }
+
+    .arcade-cabinet {
+      background: linear-gradient(135deg, #12072b 0%, #080312 100%);
+      border: 3px solid var(--neon-pink);
+      border-radius: 16px;
+      padding: 16px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(255, 0, 127, 0.4), inset 0 0 15px rgba(0, 240, 255, 0.15);
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 2px dashed var(--neon-blue);
+      padding-bottom: 12px;
+      margin-bottom: 15px;
+    }
+
+    .badge {
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+      color: #fff;
+      padding: 4px 12px;
+      font-weight: bold;
+      font-size: 11px;
+      border-radius: 15px;
+      letter-spacing: 2px;
+      box-shadow: 0 0 8px var(--neon-pink);
+    }
+
+    h1 {
+      color: var(--neon-blue);
+      font-size: 20px;
+      margin: 10px 0 4px 0;
+      text-shadow: 0 0 8px var(--neon-blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .subtitle {
+      color: var(--neon-yellow);
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 5px var(--neon-yellow);
+    }
+
+    .manifesto {
+      background: rgba(157, 0, 255, 0.15);
+      border-left: 4px solid var(--neon-yellow);
+      padding: 12px;
+      margin-bottom: 18px;
+      border-radius: 0 8px 8px 0;
+      color: #f1f5f9;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--neon-green);
+      border-radius: 10px;
+      padding: 20px 10px;
+      text-align: center;
+      background: rgba(0, 255, 102, 0.05);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .drop-zone:active {
+      background: rgba(0, 255, 102, 0.2);
+      border-color: var(--neon-yellow);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .ticket {
+      background-color: #0d0722;
+      border: 2px solid var(--neon-blue);
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+      display: none;
+    }
+
+    .ticket-header {
+      text-align: center;
+      font-weight: bold;
+      color: var(--neon-yellow);
+      border-bottom: 1px dashed var(--neon-pink);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .image-preview-container {
+      text-align: center;
+      margin: 10px 0;
+      border: 1px solid var(--neon-pink);
+      border-radius: 6px;
+      padding: 4px;
+      background: #04010a;
+      overflow: hidden;
+    }
+
+    .image-preview-container img {
+      width: 100%;
+      height: auto;
+      max-height: 400px;
+      object-fit: contain;
+      border-radius: 4px;
+      display: block;
+    }
+
+    .data-card {
+      background-color: #04010a;
+      border: 1px solid var(--neon-purple);
+      padding: 10px;
+      border-radius: 6px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+
+    .lbl-item { color: var(--neon-blue); font-weight: bold; }
+    .val-item { color: #ffffff; }
+    .val-highlight { color: var(--neon-yellow); font-weight: bold; }
+    .val-hash { color: var(--neon-green); word-break: break-all; font-size: 11px; }
+
+    .btn-download {
+      display: block;
+      width: 100%;
+      margin-top: 15px;
+      padding: 14px;
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+      color: #ffffff;
+      font-weight: bold;
+      font-family: 'Courier New', Courier, monospace;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 14px;
+      letter-spacing: 1px;
+      box-shadow: 0 0 12px rgba(255, 0, 127, 0.4);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 10px;
+      color: #94a3b8;
+      letter-spacing: 0.5px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+  </style>
+</head>
+<body>
+
+<div class="arcade-cabinet">
+
+  <div class="header">
+    <span class="badge">🕹️ MOBILE ARCADE 🕹️</span>
+    <h1>INSERT COIN :: FECHADORA</h1>
+    <div class="subtitle">EXACTITUD INSTANTÁNEA EN TU CELULAR</div>
+  </div>
+
+  <div class="manifesto">
+    "Antes ibas al fichín, ponías la ficha y tenías tiempo de juego. Hoy ponés tu documento o foto y te da exactitud instantánea en la coordenada exacta de tu existencia. Dale play - insertCoin - jugá tu juego."
+  </div>
+
+  <!-- Zona de carga apta para cámara de fotos o galería -->
+  <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+    <span style="color: var(--neon-yellow); font-size: 15px; font-weight: bold; text-shadow: 0 0 5px var(--neon-yellow);">
+      📸 SACÁ FOTO O SELECCIONÁ DOCUMENTO
+    </span>
+    <br><span style="font-size: 11px; color: var(--neon-blue); margin-top: 4px; display: inline-block;">
+      [ INSERT COIN - RAPID PLAY ]
+    </span>
+    <input type="file" id="fileInput" accept="image/*" onchange="processImage(this.files[0])">
+  </div>
+
+  <!-- Vista previa y datos -->
+  <div class="ticket" id="ticket">
+    <div class="ticket-header">
+      ⚡ DOCUMENTO FECHADO AL 100% ⚡
+    </div>
+
+    <div class="image-preview-container">
+      <img id="previewImg" src="" alt="Documento / Instantánea">
+    </div>
+
+    <div class="data-card">
+      <div><span class="lbl-item">📁 ARCHIVO:</span> <span class="val-item" id="fileName">-</span></div>
+      <div><span class="lbl-item">⏱️ INSTANTE:</span> <span class="val-highlight" id="timestamp">-</span></div>
+      <div><span class="lbl-item">⚖️ PESO:</span> <span class="val-item" id="fileSize">-</span></div>
+      <div style="margin-top: 6px;"><span class="lbl-item">🔑 HASH-ID (SHA-256):</span></div>
+      <div class="val-hash" id="hashValue">-</div>
+    </div>
+
+    <button class="btn-download" onclick="downloadStampedJPG()">
+      📥 DESCARGAR FOTO FECHADA (JPG)
+    </button>
+  </div>
+
+  <div class="footer">
+    INSERT COIN | MARDELWOOD MOBILE | HIGH SCORE PLAY
+  </div>
+
+</div>
+
+<!-- Canvas oculto para procesar el estampado a resolución completa -->
+<canvas id="exportCanvas" style="display:none;"></canvas>
+
+<script>
+  let currentFile = null;
+  let currentHash = "";
+  let currentTimestamp = "";
+  let currentFileSizeStr = "";
+  let loadedImageObj = new Image();
+
+  async function processImage(file) {
+    if (!file) return;
+    currentFile = file;
+
+    const now = new Date();
+    currentTimestamp = now.toISOString().replace('T', ' :: ').replace('Z', ' HS');
+
+    const arrayBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    currentHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    currentFileSizeStr = (file.size / 1024).toFixed(2) + " KB (" + file.size + " bytes)";
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('previewImg').src = e.target.result;
+      loadedImageObj.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    document.getElementById('fileName').innerText = file.name;
+    document.getElementById('timestamp').innerText = currentTimestamp;
+    document.getElementById('fileSize').innerText = currentFileSizeStr;
+    document.getElementById('hashValue').innerText = currentHash;
+
+    document.getElementById('ticket').style.display = 'block';
+  }
+
+  // Estampa la información en la parte inferior SIN Achicar la imagen original (100% legibilidad)
+  function downloadStampedJPG() {
+    const canvas = document.getElementById('exportCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const originalWidth = loadedImageObj.naturalWidth;
+    const originalHeight = loadedImageObj.naturalHeight;
+
+    // Calculamos una franja de sello proporcional a la resolución de la foto
+    const stampHeight = Math.max(140, Math.round(originalHeight * 0.12));
+
+    canvas.width = originalWidth;
+    canvas.height = originalHeight + stampHeight;
+
+    // 1. Dibujar la imagen al 100% de su tamaño original
+    ctx.drawImage(loadedImageObj, 0, 0, originalWidth, originalHeight);
+
+    // 2. Franja del Sello de Exactitud en el fondo del documento
+    ctx.fillStyle = "#080312";
+    ctx.fillRect(0, originalHeight, originalWidth, stampHeight);
+
+    // Línea divisoria Neón
+    ctx.strokeStyle = "#00f0ff";
+    ctx.lineWidth = Math.max(3, Math.round(originalWidth * 0.005));
+    ctx.beginPath();
+    ctx.moveTo(0, originalHeight);
+    ctx.lineTo(originalWidth, originalHeight);
+    ctx.stroke();
+
+    // 3. Escribir los datos adaptando el tamaño de letra
+    const fontSizeMain = Math.max(14, Math.round(originalWidth * 0.022));
+    const fontSizeHash = Math.max(11, Math.round(originalWidth * 0.018));
+    const padding = Math.max(15, Math.round(originalWidth * 0.02));
+
+    ctx.textAlign = "left";
+    ctx.font = "bold " + fontSizeMain + "px 'Courier New', monospace";
+
+    // Encabezado Sello
+    ctx.fillStyle = "#ffee00";
+    ctx.fillText("🕹️ MARDELWOOD FECHADORA :: EXACTITUD
