@@ -205,7 +205,7 @@
     "Antes ibas al fichín, ponías la ficha y tenías tiempo de juego. Hoy ponés tu documento o foto y te da exactitud instantánea en la coordenada exacta de tu existencia. Dale play - insertCoin - jugá tu juego."
   </div>
 
-  <!-- Zona de carga apta para cámara de fotos o galería -->
+  <!-- Zona de carga -->
   <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
     <span style="color: var(--neon-yellow); font-size: 15px; font-weight: bold; text-shadow: 0 0 5px var(--neon-yellow);">
       📸 SACÁ FOTO O SELECCIONÁ DOCUMENTO
@@ -216,7 +216,7 @@
     <input type="file" id="fileInput" accept="image/*" onchange="processImage(this.files[0])">
   </div>
 
-  <!-- Vista previa y datos -->
+  <!-- Vista previa y ticket -->
   <div class="ticket" id="ticket">
     <div class="ticket-header">
       ⚡ DOCUMENTO FECHADO AL 100% ⚡
@@ -245,7 +245,7 @@
 
 </div>
 
-<!-- Canvas oculto para procesar el estampado a resolución completa -->
+<!-- Canvas oculto para procesar el estampado -->
 <canvas id="exportCanvas" style="display:none;"></canvas>
 
 <script>
@@ -262,49 +262,62 @@
     const now = new Date();
     currentTimestamp = now.toISOString().replace('T', ' :: ').replace('Z', ' HS');
 
+    // Cálculo del Hash SHA-256
     const arrayBuffer = await file.arrayBuffer();
     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     currentHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     currentFileSizeStr = (file.size / 1024).toFixed(2) + " KB (" + file.size + " bytes)";
 
+    // Lectura de la imagen
     const reader = new FileReader();
     reader.onload = function(e) {
-      document.getElementById('previewImg').src = e.target.result;
-      loadedImageObj.src = e.target.result;
+      const dataUrl = e.target.result;
+      
+      // Cargar en la etiqueta <img> de la vista previa
+      document.getElementById('previewImg').src = dataUrl;
+
+      // Cargar en el objeto Image para el Canvas de descarga
+      loadedImageObj = new Image();
+      loadedImageObj.onload = function() {
+        // Mostrar el ticket recién cuando la imagen esté 100% cargada en memoria
+        document.getElementById('fileName').innerText = file.name;
+        document.getElementById('timestamp').innerText = currentTimestamp;
+        document.getElementById('fileSize').innerText = currentFileSizeStr;
+        document.getElementById('hashValue').innerText = currentHash;
+        document.getElementById('ticket').style.display = 'block';
+      };
+      loadedImageObj.src = dataUrl;
     };
     reader.readAsDataURL(file);
-
-    document.getElementById('fileName').innerText = file.name;
-    document.getElementById('timestamp').innerText = currentTimestamp;
-    document.getElementById('fileSize').innerText = currentFileSizeStr;
-    document.getElementById('hashValue').innerText = currentHash;
-
-    document.getElementById('ticket').style.display = 'block';
   }
 
-  // Estampa la información en la parte inferior SIN Achicar la imagen original (100% legibilidad)
   function downloadStampedJPG() {
+    if (!loadedImageObj.complete || loadedImageObj.naturalWidth === 0) {
+      alert("La imagen aún se está procesando. Por favor aguardá un segundo.");
+      return;
+    }
+
     const canvas = document.getElementById('exportCanvas');
     const ctx = canvas.getContext('2d');
 
     const originalWidth = loadedImageObj.naturalWidth;
     const originalHeight = loadedImageObj.naturalHeight;
 
-    // Calculamos una franja de sello proporcional a la resolución de la foto
+    // Calcular la franja del sello proporcional a la foto original
     const stampHeight = Math.max(140, Math.round(originalHeight * 0.12));
 
     canvas.width = originalWidth;
     canvas.height = originalHeight + stampHeight;
 
-    // 1. Dibujar la imagen al 100% de su tamaño original
+    // 1. Dibujar la imagen original a su tamaño completo (100% de nitidez)
     ctx.drawImage(loadedImageObj, 0, 0, originalWidth, originalHeight);
 
-    // 2. Franja del Sello de Exactitud en el fondo del documento
+    // 2. Fondo del sello neón en el borde inferior
     ctx.fillStyle = "#080312";
     ctx.fillRect(0, originalHeight, originalWidth, stampHeight);
 
-    // Línea divisoria Neón
+    // Borde neón superior
     ctx.strokeStyle = "#00f0ff";
     ctx.lineWidth = Math.max(3, Math.round(originalWidth * 0.005));
     ctx.beginPath();
@@ -312,7 +325,7 @@
     ctx.lineTo(originalWidth, originalHeight);
     ctx.stroke();
 
-    // 3. Escribir los datos adaptando el tamaño de letra
+    // 3. Estampar los datos
     const fontSizeMain = Math.max(14, Math.round(originalWidth * 0.022));
     const fontSizeHash = Math.max(11, Math.round(originalWidth * 0.018));
     const padding = Math.max(15, Math.round(originalWidth * 0.02));
@@ -320,6 +333,28 @@
     ctx.textAlign = "left";
     ctx.font = "bold " + fontSizeMain + "px 'Courier New', monospace";
 
-    // Encabezado Sello
+    // Título Sello
     ctx.fillStyle = "#ffee00";
-    ctx.fillText("🕹️ MARDELWOOD FECHADORA :: EXACTITUD
+    ctx.fillText("🕹️ MARDELWOOD FECHADORA :: EXACTITUD DIGITAL", padding, originalHeight + (stampHeight * 0.28));
+
+    // Fecha e Instante
+    ctx.fillStyle = "#00f0ff";
+    ctx.fillText("⏱️ " + currentTimestamp + "  |  ⚖️ " + currentFileSizeStr, padding, originalHeight + (stampHeight * 0.53));
+
+    // Hash SHA-256
+    ctx.fillStyle = "#00ff66";
+    ctx.font = "bold " + fontSizeHash + "px 'Courier New', monospace";
+    ctx.fillText("🔑 HASH-ID: " + currentHash, padding, originalHeight + (stampHeight * 0.80));
+
+    // 4. Descarga directa en JPG
+    const link = document.createElement('a');
+    link.download = 'Fechado_100pc_' + Date.now() + '.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.95);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+
+</body>
+</html>
