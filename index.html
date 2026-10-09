@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fechadora Exacta - Mobile Arcade | Mardelwood</title>
+  <title>FECHA EXACTA :: FECHIN-ON-SYSTEM</title>
   <style>
     :root {
       --bg-color: #080312;
@@ -12,6 +12,7 @@
       --neon-yellow: #ffee00;
       --neon-green: #00ff66;
       --neon-purple: #9d00ff;
+      --casio-lcd: #00ffcc;
     }
 
     * {
@@ -74,6 +75,35 @@
       font-weight: bold;
       letter-spacing: 0.5px;
       text-shadow: 0 0 5px var(--neon-yellow);
+    }
+
+    /* PANTALLA RELOJ DIGITAL CASIO 80s */
+    .casio-display {
+      background-color: #04100c;
+      border: 3px solid #1a3d32;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      margin-bottom: 15px;
+      box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.2), 0 0 12px rgba(0, 255, 204, 0.3);
+    }
+
+    .casio-label {
+      color: #558877;
+      font-size: 10px;
+      font-family: 'Courier New', Courier, monospace;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .casio-clock {
+      color: var(--casio-lcd);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px rgba(0, 255, 204, 0.8);
     }
 
     .manifesto {
@@ -160,7 +190,7 @@
 
     .lbl-item { color: var(--neon-blue); font-weight: bold; }
     .val-item { color: #ffffff; }
-    .val-highlight { color: var(--neon-yellow); font-weight: bold; }
+    .val-highlight { color: var(--casio-lcd); font-weight: bold; text-shadow: 0 0 5px var(--casio-lcd); }
     .val-hash { color: var(--neon-green); word-break: break-all; font-size: 11px; }
 
     .btn-download {
@@ -196,30 +226,36 @@
 <div class="arcade-cabinet">
 
   <div class="header">
-    <span class="badge">🕹️ MOBILE ARCADE 🕹️</span>
-    <h1>INSERT COIN :: FECHADORA</h1>
-    <div class="subtitle">EXACTITUD INSTANTÁNEA EN TU CELULAR</div>
+    <span class="badge">🕹️ FECHIN-ON-SYSTEM 🕹️</span>
+    <h1>INSERT COIN :: FECHA EXACTA</h1>
+    <div class="subtitle">SISTEMA ACTIVO DE PROCESAMIENTO INSTANTÁNEO</div>
+  </div>
+
+  <!-- RELOJ RETRO CASIO 80s EN TIEMPO REAL -->
+  <div class="casio-display">
+    <div class="casio-label">CASIO '84 DIGITAL CHRONO :: REAL TIME</div>
+    <div class="casio-clock" id="liveClock">0000-00-00 :: 00:00:00.000</div>
   </div>
 
   <div class="manifesto">
-    "Antes ibas al fichín, ponías la ficha y tenías tiempo de juego. Hoy ponés tu documento o foto y te da exactitud instantánea en la coordenada exacta de tu existencia. Dale play - insertCoin - jugá tu juego."
+    "Antes ibas al fichín, ponías la ficha y tenías tiempo de juego. Hoy ponés tu imagen en la Fechadora Exacta y te da exactitud instantánea: la coordenada exacta de tu existencia en el tiempo, con su peso, milisegundo y Hash-ID único. Dale play - insertCoin - rapid - instant - jugá tu juego."
   </div>
 
   <!-- Zona de carga -->
   <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
     <span style="color: var(--neon-yellow); font-size: 15px; font-weight: bold; text-shadow: 0 0 5px var(--neon-yellow);">
-      📸 SACÁ FOTO O SELECCIONÁ DOCUMENTO
+      📸 SACÁ FOTO O SELECCIONÁ ARCHIVO
     </span>
     <br><span style="font-size: 11px; color: var(--neon-blue); margin-top: 4px; display: inline-block;">
-      [ INSERT COIN - RAPID PLAY ]
+      [ INSERT COIN - SYSTEM ON ]
     </span>
     <input type="file" id="fileInput" accept="image/*" onchange="processImage(this.files[0])">
   </div>
 
-  <!-- Vista previa y ticket -->
+  <!-- Vista previa y datos -->
   <div class="ticket" id="ticket">
     <div class="ticket-header">
-      ⚡ DOCUMENTO FECHADO AL 100% ⚡
+      ⚡ FECHIN-ON-SYSTEM :: PROCESO COMPLETADO ⚡
     </div>
 
     <div class="image-preview-container">
@@ -228,7 +264,7 @@
 
     <div class="data-card">
       <div><span class="lbl-item">📁 ARCHIVO:</span> <span class="val-item" id="fileName">-</span></div>
-      <div><span class="lbl-item">⏱️ INSTANTE:</span> <span class="val-highlight" id="timestamp">-</span></div>
+      <div><span class="lbl-item">⏱️ CASIO TIME:</span> <span class="val-highlight" id="timestamp">-</span></div>
       <div><span class="lbl-item">⚖️ PESO:</span> <span class="val-item" id="fileSize">-</span></div>
       <div style="margin-top: 6px;"><span class="lbl-item">🔑 HASH-ID (SHA-256):</span></div>
       <div class="val-hash" id="hashValue">-</div>
@@ -240,7 +276,7 @@
   </div>
 
   <div class="footer">
-    INSERT COIN | MARDELWOOD MOBILE | HIGH SCORE PLAY
+    INSERT COIN | FECHIN-ON-SYSTEM | DISPOSITIVO PÚBLICO
   </div>
 
 </div>
@@ -255,12 +291,31 @@
   let currentFileSizeStr = "";
   let loadedImageObj = new Image();
 
+  // Reloj digital continuo estilo Casio 80s
+  function updateLiveClock() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const ms = String(now.getMilliseconds()).padStart(3, '0');
+
+    const clockStr = `${year}-${month}-${day} :: ${hours}:${minutes}:${seconds}.${ms}`;
+    document.getElementById('liveClock').innerText = clockStr;
+    return clockStr;
+  }
+
+  // Actualización del reloj cada 35 milisegundos
+  setInterval(updateLiveClock, 35);
+
   async function processImage(file) {
     if (!file) return;
     currentFile = file;
 
-    const now = new Date();
-    currentTimestamp = now.toISOString().replace('T', ' :: ').replace('Z', ' HS');
+    // Congela el instante exacto del reloj Casio
+    currentTimestamp = updateLiveClock();
 
     // Cálculo del Hash SHA-256
     const arrayBuffer = await file.arrayBuffer();
@@ -269,18 +324,14 @@
     currentHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     currentFileSizeStr = (file.size / 1024).toFixed(2) + " KB (" + file.size + " bytes)";
 
-    // Lectura de la imagen
+    // Lectura de imagen
     const reader = new FileReader();
     reader.onload = function(e) {
       const dataUrl = e.target.result;
-      
-      // Cargar en la etiqueta <img> de la vista previa
       document.getElementById('previewImg').src = dataUrl;
 
-      // Cargar en el objeto Image para el Canvas de descarga
       loadedImageObj = new Image();
       loadedImageObj.onload = function() {
-        // Mostrar el ticket recién cuando la imagen esté 100% cargada en memoria
         document.getElementById('fileName').innerText = file.name;
         document.getElementById('timestamp').innerText = currentTimestamp;
         document.getElementById('fileSize').innerText = currentFileSizeStr;
@@ -304,21 +355,19 @@
     const originalWidth = loadedImageObj.naturalWidth;
     const originalHeight = loadedImageObj.naturalHeight;
 
-    // Calcular la franja del sello proporcional a la foto original
-    const stampHeight = Math.max(140, Math.round(originalHeight * 0.12));
+    const stampHeight = Math.max(150, Math.round(originalHeight * 0.13));
 
     canvas.width = originalWidth;
     canvas.height = originalHeight + stampHeight;
 
-    // 1. Dibujar la imagen original a su tamaño completo (100% de nitidez)
+    // 1. Imagen original a tamaño completo (100% legibilidad)
     ctx.drawImage(loadedImageObj, 0, 0, originalWidth, originalHeight);
 
-    // 2. Fondo del sello neón en el borde inferior
-    ctx.fillStyle = "#080312";
+    // 2. Fondo del sello estilo Casio / Neón
+    ctx.fillStyle = "#040b10";
     ctx.fillRect(0, originalHeight, originalWidth, stampHeight);
 
-    // Borde neón superior
-    ctx.strokeStyle = "#00f0ff";
+    ctx.strokeStyle = "#00ffcc";
     ctx.lineWidth = Math.max(3, Math.round(originalWidth * 0.005));
     ctx.beginPath();
     ctx.moveTo(0, originalHeight);
@@ -333,22 +382,20 @@
     ctx.textAlign = "left";
     ctx.font = "bold " + fontSizeMain + "px 'Courier New', monospace";
 
-    // Título Sello
     ctx.fillStyle = "#ffee00";
-    ctx.fillText("🕹️ MARDELWOOD FECHADORA :: EXACTITUD DIGITAL", padding, originalHeight + (stampHeight * 0.28));
+    ctx.fillText("FECHA EXACTA :: FECHIN-ON-SYSTEM", padding, originalHeight + (stampHeight * 0.28));
 
-    // Fecha e Instante
-    ctx.fillStyle = "#00f0ff";
-    ctx.fillText("⏱️ " + currentTimestamp + "  |  ⚖️ " + currentFileSizeStr, padding, originalHeight + (stampHeight * 0.53));
+    // Estampa en color verde LCD Casio
+    ctx.fillStyle = "#00ffcc";
+    ctx.fillText("⏱️ CASIO TIME: " + currentTimestamp + "  |  ⚖️ " + currentFileSizeStr, padding, originalHeight + (stampHeight * 0.53));
 
-    // Hash SHA-256
     ctx.fillStyle = "#00ff66";
     ctx.font = "bold " + fontSizeHash + "px 'Courier New', monospace";
     ctx.fillText("🔑 HASH-ID: " + currentHash, padding, originalHeight + (stampHeight * 0.80));
 
-    // 4. Descarga directa en JPG
+    // 4. Descarga en JPG
     const link = document.createElement('a');
-    link.download = 'Fechado_100pc_' + Date.now() + '.jpg';
+    link.download = 'CasioTime_Fechado_' + Date.now() + '.jpg';
     link.href = canvas.toDataURL('image/jpeg', 0.95);
     document.body.appendChild(link);
     link.click();
